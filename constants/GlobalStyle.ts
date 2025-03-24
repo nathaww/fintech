@@ -20,10 +20,13 @@ export const defaultStyles = StyleSheet.create({
   textLink: {
     fontSize: 18,
     fontWeight: '500',
+    color: "#605D95",
+    paddingVertical: 10,
   },
   descriptionText: {
     fontSize: 18,
     marginTop: 20,
+    color: Colors.gray
   },
   buttonText: {
     color: '#fff',

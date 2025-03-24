@@ -5,12 +5,15 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
+import { Link, Stack, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import "react-native-reanimated";
 
 import { useColorScheme } from "@/components/useColorScheme";
+import Colors from "@/constants/Colors";
+import { TouchableOpacity } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -51,23 +54,65 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
-
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen
-          name="index"
-          options={{ headerShown: false, animation: "none" }}
-        />
-        <Stack.Screen
-          name="signup"
-          options={{ headerShown: false, animation: "none" }}
-        />
-        <Stack.Screen
-          name="login"
-          options={{ headerShown: false, animation: "none" }}
-        />
-      </Stack>
+      <InitialLayout />
     </ThemeProvider>
   );
 }
+
+const InitialLayout = () => {
+  const colorScheme = useColorScheme();
+  const router = useRouter();
+  return (
+    <Stack>
+      <Stack.Screen
+        name="index"
+        options={{ headerShown: false, animation: "none" }}
+      />
+      <Stack.Screen
+        name="help"
+        options={{ title: "Help", animation: "none" }}
+      />
+      <Stack.Screen
+        name="signup"
+        options={{
+          title: "",
+          headerBackTitle: "",
+          headerShadowVisible: false,
+          headerStyle: {
+            backgroundColor:
+              colorScheme === "light"
+                ? Colors.backgroundLight
+                : Colors.backgroundDark,
+          },
+          animation: "none",
+        }}
+      />
+      <Stack.Screen
+        name="login"
+        options={{
+          title: "",
+          headerBackTitle: "",
+          headerShadowVisible: false,
+          headerStyle: {
+            backgroundColor:
+              colorScheme === "light"
+                ? Colors.backgroundLight
+                : Colors.backgroundDark,
+          },
+          headerRight: () => (
+            <Link href={"/help"}>
+              <FontAwesome
+                name="question-circle"
+                size={30}
+                color={Colors.primaryLight}
+              />
+            </Link>
+          ),
+          animation: "none",
+        }}
+      />
+    </Stack>
+  );
+};
