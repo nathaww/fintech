@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
@@ -10,11 +11,32 @@ import Colors from "@/constants/Colors";
 import { defaultStyles } from "@/constants/GlobalStyle";
 import { useState } from "react";
 import { Link, useRouter } from "expo-router";
+import { useSignUp } from "@clerk/clerk-expo";
 
 const signup = () => {
   const router = useRouter();
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [countryCode, setCountryCode] = useState("+251");
+  const { signUp } = useSignUp();
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const onSignup = async () => {
+    setLoading(true);
+    try {
+      await signUp!.create({
+        emailAddress: email,
+      });
+      signUp!.prepareEmailAddressVerification();
+
+      router.push({
+        pathname: "/verify/[email]",
+        params: { email: email },
+      });
+    } catch (error) {
+      console.error("Error signing up:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <KeyboardAvoidingView
@@ -34,22 +56,16 @@ const signup = () => {
           Let's get started!
         </Text>
         <Text style={defaultStyles.descriptionText}>
-          Enter your phone number. We will send you a confirmation code there.
+          Enter your email address. We will send you a confirmation code there.
         </Text>
 
         <View style={styles.inputContainer}>
           <ThemedInput
-            style={styles.input}
-            placeholder="Country code"
-            value={countryCode}
-            onChangeText={setCountryCode}
-          />
-          <ThemedInput
             style={[styles.input, { flex: 1 }]}
-            placeholder="Mobile number"
-            keyboardType="numeric"
-            value={phoneNumber}
-            onChangeText={setPhoneNumber}
+            placeholder="E-mail"
+            keyboardType="email"
+            value={email}
+            onChangeText={setEmail}
           />
         </View>
 
@@ -75,16 +91,20 @@ const signup = () => {
               backgroundColor: Colors.primaryLight,
             },
           ]}
-          disabled={phoneNumber === ""}
-          onPress={() => {}}
+          disabled={email === ""}
+          onPress={onSignup}
         >
-          <Text
-            style={defaultStyles.buttonText}
-            lightColor={Colors.secondaryDark}
-            darkColor={Colors.secondaryLight}
-          >
-            Sign up
-          </Text>
+          {!loading ? (
+            <Text
+              style={defaultStyles.buttonText}
+              lightColor={Colors.secondaryDark}
+              darkColor={Colors.secondaryLight}
+            >
+              Sign up
+            </Text>
+          ) : (
+            <ActivityIndicator size="large" color={Colors.primaryDark} />
+          )}
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>

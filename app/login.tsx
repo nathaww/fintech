@@ -1,4 +1,6 @@
 import {
+  ActivityIndicator,
+  Alert,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
@@ -9,38 +11,47 @@ import ThemedInput from "@/components/ThemedInput";
 import Colors from "@/constants/Colors";
 import { defaultStyles } from "@/constants/GlobalStyle";
 import { useState } from "react";
-import { Link, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { isClerkAPIResponseError, useSignIn } from "@clerk/clerk-expo";
+
+enum SignInType {
+  Phone,
+  Email,
+  Google,
+  Apple,
+}
 
 const login = () => {
   const router = useRouter();
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [countryCode, setCountryCode] = useState("+251");
+  const { signIn } = useSignIn();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const onSignIn = async (type: SignInType) => {
-    if (type === SignInType.Phone) {
+    if (type === SignInType.Email) {
+      setLoading(true);
       try {
-        const fullPhoneNumber = `${countryCode}${phoneNumber}`;
-
         const { supportedFirstFactors } = await signIn!.create({
-          identifier: fullPhoneNumber,
+          identifier: email,
+          password
         });
-        const firstPhoneFactor: any = supportedFirstFactors.find(
-          (factor: any) => {
-            return factor.strategy === "phone_code";
-          }
+
+        const firstEmailFactor: any = supportedFirstFactors?.find(
+          (factor: any) => factor.strategy === "email_code"
         );
 
-        const { phoneNumberId } = firstPhoneFactor;
+        const { emailAddressId } = firstEmailFactor;
 
         await signIn!.prepareFirstFactor({
-          strategy: "phone_code",
-          phoneNumberId,
+          strategy: "email_code",
+          emailAddressId,
         });
 
         router.push({
-          pathname: "/verify/[phone]",
-          params: { phone: fullPhoneNumber, signin: "true" },
+          pathname: "/verify/[email]",
+          params: { email, signin: "true" },
         });
       } catch (err) {
         console.log("error", JSON.stringify(err, null, 2));
@@ -49,6 +60,8 @@ const login = () => {
             Alert.alert("Error", err.errors[0].message);
           }
         }
+      } finally {
+        setLoading(false);
       }
     }
   };
@@ -76,17 +89,20 @@ const login = () => {
 
         <View style={styles.inputContainer}>
           <ThemedInput
-            style={styles.input}
-            placeholder="Country code"
-            value={countryCode}
-            onChangeText={setCountryCode}
+            style={[styles.input, { flex: 1 }]}
+            placeholder="E-mail"
+            keyboardType="email"
+            value={email}
+            onChangeText={setEmail}
           />
+        </View>
+        <View style={styles.inputContainer}>
           <ThemedInput
             style={[styles.input, { flex: 1 }]}
-            placeholder="Mobile number"
-            keyboardType="numeric"
-            value={phoneNumber}
-            onChangeText={setPhoneNumber}
+            placeholder="Password"
+            keyboardType="password"
+            value={password}
+            onChangeText={setPassword}
           />
         </View>
 
@@ -98,16 +114,20 @@ const login = () => {
               backgroundColor: Colors.primaryLight,
             },
           ]}
-          disabled={phoneNumber === ""}
+          disabled={email === ""}
           onPress={() => {}}
         >
-          <Text
-            style={defaultStyles.buttonText}
-            lightColor={Colors.secondaryDark}
-            darkColor={Colors.secondaryLight}
-          >
-            Login
-          </Text>
+          {loading ? (
+            <ActivityIndicator size="large" color={Colors.primaryDark} />
+          ) : (
+            <Text
+              style={defaultStyles.buttonText}
+              lightColor={Colors.secondaryDark}
+              darkColor={Colors.secondaryLight}
+            >
+              Login
+            </Text>
+          )}
         </TouchableOpacity>
 
         <View style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
@@ -130,7 +150,7 @@ const login = () => {
 
         <TouchableOpacity
           onPress={() => onSignIn(SignInType.Email)}
-          style={[ 
+          style={[
             defaultStyles.pillButton,
             {
               flexDirection: "row",
@@ -190,7 +210,7 @@ export default login;
 
 const styles = StyleSheet.create({
   inputContainer: {
-    marginVertical: 40,
+    marginVertical: 10,
     flexDirection: "row",
   },
   input: {
