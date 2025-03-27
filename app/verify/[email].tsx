@@ -1,3 +1,4 @@
+import CustomAlert from "@/components/CustomAlert";
 import { Text, View } from "@/components/Themed";
 import Colors from "@/constants/Colors";
 import { defaultStyles } from "@/constants/GlobalStyle";
@@ -25,6 +26,8 @@ const Page = () => {
   const [code, setCode] = useState("");
   const { signIn } = useSignIn();
   const { signUp, setActive } = useSignUp();
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertVisible, setAlertVisible] = useState(false);
 
   const ref = useBlurOnFulfill({ value: code, cellCount: CELL_COUNT });
   const [props, getCellOnLayoutHandler] = useClearByFocusCell({
@@ -63,19 +66,21 @@ const Page = () => {
         code,
       });
       await setActive!({ session: signIn!.createdSessionId });
-    } catch (err) {
-      console.log("error", JSON.stringify(err, null, 2));
-      if (isClerkAPIResponseError(err)) {
-        Alert.alert("Error", err.errors[0].longMessage);
+    } catch (err: any) {
+      if (err.errors?.length > 0) {
+        setAlertMessage(`Error: ${err.errors[0].message}`);
+      } else {
+        setAlertMessage("An unexpected error occurred. Please try again.");
       }
+      setAlertVisible(true);
     }
   };
 
   return (
     <View
-        style={defaultStyles.container}
-          lightColor={Colors.backgroundLight}
-          darkColor={Colors.backgroundDark}
+      style={defaultStyles.container}
+      lightColor={Colors.backgroundLight}
+      darkColor={Colors.backgroundDark}
     >
       <Text
         lightColor={Colors.secondaryDark}
@@ -137,6 +142,12 @@ const Page = () => {
           </Text>
         </TouchableOpacity>
       </Link>
+
+      <CustomAlert
+        isVisible={alertVisible}
+        message={alertMessage}
+        onClose={() => setAlertVisible(false)}
+      />
     </View>
   );
 };

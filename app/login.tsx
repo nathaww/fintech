@@ -1,6 +1,5 @@
 import {
   ActivityIndicator,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
@@ -13,7 +12,8 @@ import { defaultStyles } from "@/constants/GlobalStyle";
 import { useState } from "react";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { isClerkAPIResponseError, useSignIn } from "@clerk/clerk-expo";
+import { useSignIn } from "@clerk/clerk-expo";
+import CustomAlert from "@/components/CustomAlert";
 
 enum SignInType {
   Phone,
@@ -24,45 +24,37 @@ enum SignInType {
 
 const login = () => {
   const router = useRouter();
-  const { signIn } = useSignIn();
-  const [email, setEmail] = useState("");
+  const { signIn, isLoaded, setActive } = useSignIn();
+  const [emailAddress, setEmailAddress] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertVisible, setAlertVisible] = useState(false);
 
   const onSignIn = async (type: SignInType) => {
-    if (type === SignInType.Email) {
+    if (!isLoaded) return;
+
+    try {
       setLoading(true);
-      try {
-        const { supportedFirstFactors } = await signIn!.create({
-          identifier: email,
-          password
-        });
-
-        const firstEmailFactor: any = supportedFirstFactors?.find(
-          (factor: any) => factor.strategy === "email_code"
-        );
-
-        const { emailAddressId } = firstEmailFactor;
-
-        await signIn!.prepareFirstFactor({
-          strategy: "email_code",
-          emailAddressId,
-        });
-
-        router.push({
-          pathname: "/verify/[email]",
-          params: { email, signin: "true" },
-        });
-      } catch (err) {
-        console.log("error", JSON.stringify(err, null, 2));
-        if (isClerkAPIResponseError(err)) {
-          if (err.errors[0].code === "form_identifier_not_found") {
-            Alert.alert("Error", err.errors[0].message);
-          }
-        }
-      } finally {
-        setLoading(false);
+      const signInAttempt = await signIn.create({
+        identifier: emailAddress,
+        password,
+      });
+      if (signInAttempt.status === "complete") {
+        await setActive({ session: signInAttempt.createdSessionId });
+        router.replace("/");
+      } else {
+        console.error(JSON.stringify(signInAttempt, null, 2));
       }
+    } catch (err: any) {
+      if (err.errors?.length > 0) {
+        setAlertMessage(`Error: ${err.errors[0].message}`);
+      } else {
+        setAlertMessage("An unexpected error occurred. Please try again.");
+      }
+      setAlertVisible(true);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -83,7 +75,7 @@ const login = () => {
         >
           Welcome back!
         </Text>
-        <Text style={defaultStyles.descriptionText}>
+        <Text style={[defaultStyles.descriptionText, { marginBottom: 20 }]}>
           Enter your phone number. We will send you a confirmation code there.
         </Text>
 
@@ -91,9 +83,9 @@ const login = () => {
           <ThemedInput
             style={[styles.input, { flex: 1 }]}
             placeholder="E-mail"
-            keyboardType="email"
-            value={email}
-            onChangeText={setEmail}
+            keyboardType="email-address"
+            value={emailAddress}
+            onChangeText={setEmailAddress}
           />
         </View>
         <View style={styles.inputContainer}>
@@ -101,6 +93,7 @@ const login = () => {
             style={[styles.input, { flex: 1 }]}
             placeholder="Password"
             keyboardType="password"
+            secureTextEntry
             value={password}
             onChangeText={setPassword}
           />
@@ -114,7 +107,7 @@ const login = () => {
               backgroundColor: Colors.primaryLight,
             },
           ]}
-          disabled={email === ""}
+          disabled={emailAddress === ""}
           onPress={() => {}}
         >
           {loading ? (
@@ -202,6 +195,12 @@ const login = () => {
           </Text>
         </TouchableOpacity>
       </View>
+
+      <CustomAlert
+        isVisible={alertVisible}
+        message={alertMessage}
+        onClose={() => setAlertVisible(false)}
+      />
     </KeyboardAvoidingView>
   );
 };
@@ -210,13 +209,12 @@ export default login;
 
 const styles = StyleSheet.create({
   inputContainer: {
-    marginVertical: 10,
     flexDirection: "row",
   },
   input: {
     padding: 20,
     borderRadius: 16,
     fontSize: 20,
-    marginRight: 10,
+    marginBottom: 20,
   },
 });
