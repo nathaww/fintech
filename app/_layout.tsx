@@ -5,7 +5,7 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { Link, Stack } from "expo-router";
+import { Link, Stack, useRouter, useSegments } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import "react-native-reanimated";
@@ -13,6 +13,9 @@ import { ClerkProvider, useAuth } from "@clerk/clerk-expo";
 import { useColorScheme } from "@/components/useColorScheme";
 import Colors from "@/constants/Colors";
 import * as SecureStore from "expo-secure-store";
+import { SafeAreaView, View } from "@/components/Themed";
+import { ActivityIndicator } from "react-native";
+import { StatusBar } from "expo-status-bar";
 
 const tokenCache = {
   async getToken(key: string) {
@@ -45,6 +48,8 @@ export const unstable_settings = {
 SplashScreen.preventAutoHideAsync();
 
 const InitialLayout = () => {
+  const router = useRouter();
+  const segments = useSegments();
   const colorScheme = useColorScheme();
   const { isLoaded, isSignedIn } = useAuth();
   const [loaded, error] = useFonts({
@@ -58,16 +63,15 @@ const InitialLayout = () => {
   }, [error]);
 
   useEffect(() => {
-    console.log(isSignedIn);
-    // if (!isLoaded) return;
+    if (!isLoaded) return;
 
-    // const inAuthGroup = segments[0] === '(authenticated)';
+    const inAuthGroup = segments[0] === "(authenticated)";
 
-    // if (isSignedIn && !inAuthGroup) {
-    //   router.replace('/(authenticated)/(tabs)/home');
-    // } else if (!isSignedIn) {
-    //   router.replace('/');
-    // }
+    if (isSignedIn && !inAuthGroup) {
+      router.replace("/(authenticated)/(tabs)/home");
+    } else if (!isSignedIn) {
+      router.replace("/");
+    }
   }, [isSignedIn]);
 
   useEffect(() => {
@@ -76,12 +80,24 @@ const InitialLayout = () => {
     }
   }, [loaded]);
 
-  if (!loaded) {
-    return null;
+  if (!loaded || !isLoaded) {
+    return (
+      <SafeAreaView
+        lightColor={Colors.backgroundLight}
+        darkColor={Colors.backgroundDark}
+        style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+      >
+        <ActivityIndicator size="large" color={Colors.primaryLight} />
+      </SafeAreaView>
+    );
   }
 
   return (
     <Stack>
+      <Stack.Screen
+        name="(authenticated)/(tabs)"
+        options={{ headerShown: false }}
+      />
       <Stack.Screen
         name="index"
         options={{ headerShown: false, animation: "none" }}
@@ -156,6 +172,7 @@ const RootLayoutNav = () => {
         tokenCache={tokenCache}
         publishableKey={process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!}
       >
+        <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
         <InitialLayout />
       </ClerkProvider>
     </ThemeProvider>

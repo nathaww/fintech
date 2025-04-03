@@ -42,7 +42,7 @@ const login = () => {
       });
       if (signInAttempt.status === "complete") {
         await setActive({ session: signInAttempt.createdSessionId });
-        router.replace("/");
+        router.replace("/(authenticated)/(tabs)/home");
       } else {
         console.error(JSON.stringify(signInAttempt, null, 2));
       }
@@ -60,7 +60,7 @@ const login = () => {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: "#111" }}
+      style={{ flex: 1 }}
       keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
     >
       <View
@@ -108,7 +108,7 @@ const login = () => {
             },
           ]}
           disabled={emailAddress === ""}
-          onPress={() => {}}
+          onPress={() => onSignIn(SignInType.Email)}
         >
           {loading ? (
             <ActivityIndicator size="large" color={Colors.primaryDark} />
@@ -142,7 +142,7 @@ const login = () => {
         </View>
 
         <TouchableOpacity
-          onPress={() => onSignIn(SignInType.Email)}
+          onPress={() => {}}
           style={[
             defaultStyles.pillButton,
             {
@@ -160,7 +160,7 @@ const login = () => {
         </TouchableOpacity>
 
         <TouchableOpacity
-          onPress={() => onSignIn(SignInType.Google)}
+          onPress={() => {}}
           style={[
             defaultStyles.pillButton,
             {
@@ -173,12 +173,12 @@ const login = () => {
         >
           <Ionicons name="logo-google" size={24} color={Colors.primaryLight} />
           <Text style={[defaultStyles.buttonText, { color: "#000" }]}>
-            Continue with email{" "}
+            Continue with G-mail{" "}
           </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          onPress={() => onSignIn(SignInType.Apple)}
+          onPress={() => {}}
           style={[
             defaultStyles.pillButton,
             {
@@ -191,7 +191,7 @@ const login = () => {
         >
           <Ionicons name="logo-apple" size={24} color={Colors.primaryLight} />
           <Text style={[defaultStyles.buttonText, { color: "#000" }]}>
-            Continue with email{" "}
+            Continue with Apple{" "}
           </Text>
         </TouchableOpacity>
       </View>

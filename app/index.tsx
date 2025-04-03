@@ -1,7 +1,6 @@
 import { StyleSheet, useColorScheme, TouchableOpacity } from "react-native";
 import { View, Text, SafeAreaView } from "@/components/Themed";
 import Colors from "@/constants/Colors";
-import { StatusBar } from "expo-status-bar";
 import { useVideoPlayer, VideoView } from "expo-video";
 import { Link } from "expo-router";
 import { defaultStyles } from "@/constants/GlobalStyle";
@@ -20,7 +19,6 @@ const index = () => {
       lightColor={Colors.backgroundLight}
       darkColor={Colors.backgroundDark}
     >
-      <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
       <VideoView
         style={styles.video}
         player={player}
