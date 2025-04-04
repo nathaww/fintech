@@ -20,7 +20,11 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "com.zegeye.fintech"
     },
     "web": {
       "bundler": "metro",
@@ -29,10 +33,15 @@
     },
     "plugins": [
       [
-
         "expo-router",
         {
           "origin": "https://galaxies.dev"
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you share them with your friends."
         }
       ],
       "expo-asset",
@@ -41,6 +50,14 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": "https://galaxies.dev"
+      },
+      "eas": {
+        "projectId": "e124521e-f4c2-433e-8416-45600e1aeb23"
+      }
     }
   }
 }

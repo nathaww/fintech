@@ -6,8 +6,10 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BlurView } from "expo-blur";
 import { Link } from "expo-router";
 import { Text, View } from "./Themed";
+import { useUser } from "@clerk/clerk-expo";
 
 const CustomHeader = () => {
+  const { user } = useUser();
   const { top } = useSafeAreaInsets();
   const colorScheme = useColorScheme();
   return (
@@ -32,7 +34,10 @@ const CustomHeader = () => {
               width: 40,
               height: 40,
               borderRadius: 20,
-              backgroundColor: colorScheme === "light" ? Colors.primaryLight : Colors.secondaryDark,
+              backgroundColor:
+                colorScheme === "light"
+                  ? Colors.primaryLight
+                  : Colors.secondaryDark,
               justifyContent: "center",
               alignItems: "center",
             }}
@@ -42,7 +47,7 @@ const CustomHeader = () => {
               darkColor={Colors.secondaryLight}
               style={{ fontWeight: "500", fontSize: 16 }}
             >
-              SG
+              {user?.firstName?.charAt(0).toUpperCase() || "U"}
             </Text>
           </TouchableOpacity>
         </Link>

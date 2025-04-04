@@ -1,4 +1,4 @@
-import { useLocalSearchParams } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import {
   SectionList,
   StyleSheet,
@@ -20,6 +20,7 @@ const categories = ["Overview", "News", "Orders", "Transactions"];
 const screenWidth = Dimensions.get("window").width;
 
 const Page = () => {
+  const router = useRouter();
   const { id } = useLocalSearchParams();
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -63,7 +64,7 @@ const Page = () => {
     );
   }
 
-  if (marketError || coinError) {
+  if (marketError || coinError || marketChart.length === 0) {
     return (
       <SafeAreaView
         lightColor={Colors.backgroundLight}
@@ -130,6 +131,15 @@ const Page = () => {
             </View>
             <View style={styles.actionsRow}>
               <TouchableOpacity
+                onPress={router.back}
+                style={[defaultStyles.pillButtonSmall, styles.buyButton]}
+              >
+                <Ionicons name="arrow-back" size={24} color={"#fff"} />
+                <Text style={[defaultStyles.buttonText, { color: "#fff" }]}>
+                  Back
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
                 style={[defaultStyles.pillButtonSmall, styles.buyButton]}
               >
                 <Ionicons name="add" size={24} color={"#fff"} />
@@ -163,7 +173,7 @@ const Page = () => {
         renderItem={() => (
           <>
             {marketChart && (
-              <View style={[defaultStyles.block]}>
+              <View style={{alignSelf: "center"}}>
                 <Text
                   lightColor={Colors.secondaryDark}
                   darkColor={Colors.secondaryLight}
@@ -176,33 +186,28 @@ const Page = () => {
                     labels: [],
                     datasets: [
                       {
-                        data: marketChart?.prices?.map((p: number[]) => p[1]),
+                        data:
+                          marketChart &&
+                          marketChart?.prices?.map((p: number[]) => p[1]),
                       },
                     ],
                   }}
                   width={screenWidth - 20}
-                  height={320}
+                  height={350}
                   yAxisSuffix="$"
                   chartConfig={{
                     backgroundGradientFrom: "#fff",
                     backgroundGradientTo: "#fff",
-                    decimalPlaces: 2,
+                    decimalPlaces: 0,
                     color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
                     labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                    style: {
-                      padding: 0,
-                      alignItems: "center",
-                    },
                     propsForDots: {
                       r: "3",
                       strokeWidth: "2",
                       stroke: Colors.primaryLight,
                     },
                   }}
-                  bezier
                   style={{
-                    marginHorizontal: 10,
-                    alignSelf: "center",
                     borderRadius: 16,
                   }}
                 />

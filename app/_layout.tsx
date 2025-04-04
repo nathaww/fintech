@@ -14,10 +14,12 @@ import { useColorScheme } from "@/components/useColorScheme";
 import Colors from "@/constants/Colors";
 import * as SecureStore from "expo-secure-store";
 import { SafeAreaView, View } from "@/components/Themed";
-import { ActivityIndicator } from "react-native";
+import { ActivityIndicator, TouchableOpacity } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Ionicons } from "@expo/vector-icons";
+import { UserInactivityProvider } from "@/context/UserInactivity";
 
 const tokenCache = {
   async getToken(key: string) {
@@ -40,11 +42,6 @@ export {
   // Catch any errors thrown by the Layout component.
   ErrorBoundary,
 } from "expo-router";
-
-export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: "(tabs)",
-};
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -98,11 +95,14 @@ const InitialLayout = () => {
     <Stack>
       <Stack.Screen
         name="(authenticated)/(tabs)"
-        options={{ headerShown: false,  animation: "ios_from_right", }}
+        options={{ headerShown: false, animation: "ios_from_right" }}
       />
       <Stack.Screen
         name="(authenticated)/crypto/[id]"
-        options={{ headerShown: false,  animation: "ios_from_right", }}
+        options={{
+          animation: "ios_from_right",
+          headerShown: false,
+        }}
       />
       <Stack.Screen
         name="index"
@@ -166,6 +166,18 @@ const InitialLayout = () => {
           animation: "ios_from_right",
         }}
       />
+      <Stack.Screen
+        name="(authenticated)/(modals)/lock"
+        options={{ headerShown: false, animation: "none" }}
+      />
+      <Stack.Screen
+        name="(authenticated)/(modals)/account"
+        options={{
+          presentation: "modal",
+          animation: "ios_from_left",
+          headerShown: false,
+        }}
+      />
     </Stack>
   );
 };
@@ -175,17 +187,21 @@ const RootLayoutNav = () => {
   const queryClient = new QueryClient();
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-        <QueryClientProvider client={queryClient}>
-          <ClerkProvider
-            tokenCache={tokenCache}
-            publishableKey={process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!}
-          >
-            <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
-            <InitialLayout />
-          </ClerkProvider>
-        </QueryClientProvider>
-      </ThemeProvider>
+      <ClerkProvider
+        tokenCache={tokenCache}
+        publishableKey={process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!}
+      >
+        <ThemeProvider
+          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+        >
+          <QueryClientProvider client={queryClient}>
+            <UserInactivityProvider>
+              <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
+              <InitialLayout />
+            </UserInactivityProvider>
+          </QueryClientProvider>
+        </ThemeProvider>
+      </ClerkProvider>
     </GestureHandlerRootView>
   );
 };

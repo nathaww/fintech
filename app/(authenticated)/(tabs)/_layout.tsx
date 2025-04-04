@@ -72,14 +72,6 @@ export default function TabLayout() {
           ),
         }}
       />
-      <Tabs.Screen
-        name="lifestyle"
-        options={{
-          headerShown: false,
-          title: "Lifestyle",
-          tabBarIcon: ({ color }) => <TabBarIcon name="heart" color={color} />,
-        }}
-      />
     </Tabs>
   );
 }

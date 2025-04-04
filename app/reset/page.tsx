@@ -52,7 +52,6 @@ const Page = () => {
       });
       await setActive!({ session: signUp!.createdSessionId });
     } catch (err) {
-      console.log("error", JSON.stringify(err, null, 2));
       if (isClerkAPIResponseError(err)) {
         Alert.alert("Error", err.errors[0].message);
       }
