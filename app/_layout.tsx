@@ -16,6 +16,8 @@ import * as SecureStore from "expo-secure-store";
 import { SafeAreaView, View } from "@/components/Themed";
 import { ActivityIndicator } from "react-native";
 import { StatusBar } from "expo-status-bar";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const tokenCache = {
   async getToken(key: string) {
@@ -96,7 +98,11 @@ const InitialLayout = () => {
     <Stack>
       <Stack.Screen
         name="(authenticated)/(tabs)"
-        options={{ headerShown: false }}
+        options={{ headerShown: false,  animation: "ios_from_right", }}
+      />
+      <Stack.Screen
+        name="(authenticated)/crypto/[id]"
+        options={{ headerShown: false,  animation: "ios_from_right", }}
       />
       <Stack.Screen
         name="index"
@@ -166,16 +172,21 @@ const InitialLayout = () => {
 
 const RootLayoutNav = () => {
   const colorScheme = useColorScheme();
+  const queryClient = new QueryClient();
   return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <ClerkProvider
-        tokenCache={tokenCache}
-        publishableKey={process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!}
-      >
-        <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
-        <InitialLayout />
-      </ClerkProvider>
-    </ThemeProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+        <QueryClientProvider client={queryClient}>
+          <ClerkProvider
+            tokenCache={tokenCache}
+            publishableKey={process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!}
+          >
+            <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
+            <InitialLayout />
+          </ClerkProvider>
+        </QueryClientProvider>
+      </ThemeProvider>
+    </GestureHandlerRootView>
   );
 };
 

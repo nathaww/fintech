@@ -2,6 +2,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Tabs } from "expo-router";
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "@/components/useColorScheme";
+import CustomHeader from "@/components/CustomHeader";
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
@@ -21,27 +22,22 @@ export default function TabLayout() {
           colorScheme === "light" ? Colors.primaryDark : Colors.secondaryLight,
         tabBarInactiveTintColor:
           colorScheme === "light" ? Colors.gray : Colors.secondaryDark,
-
         tabBarStyle: {
-          width: "95%",
-          height: 60,
-          elevation: 20,
-          borderRadius: 10,
-          marginBottom: 5,
-          marginVertical: "auto",
-          alignSelf: "center",
+          height: 65,
+          elevation: 10,
           paddingTop: 5,
-          borderTopWidth: 0,
+          borderTopWidth: 1,
+          backgroundColor:
+            colorScheme === "light"
+              ? "rgba(255, 255, 255, 1)"
+              : "rgba(33, 31, 38, 1)",
         },
-        // Disable the static render of the header on web
-        // to prevent a hydration error in React Navigation v6.
-        headerShown: false,
       }}
     >
       <Tabs.Screen
         name="home"
         options={{
-          headerShown: false,
+          header: ()=> <CustomHeader/>,
           title: "Home",
           tabBarIcon: ({ color }) => <TabBarIcon name="dollar" color={color} />,
         }}
