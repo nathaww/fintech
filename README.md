@@ -8,7 +8,11 @@ Get started with our Android app:
 
 ## Demo
 Check out our app demo video:
-[Watch Demo](assets/videos/mockup.mp4)
+
+<video width="100%" controls>
+  <source src="assets/videos/mockup.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
 
 ## 🔐 Demo Credentials
 - Email: jane@example.com
