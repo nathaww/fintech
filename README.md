@@ -7,12 +7,9 @@ Get started with our Android app:
 [Download APK](assets/fintech.apk)
 
 ## Demo
-Check out our app demo video:
 
-<video width="100%" controls>
-  <source src="assets/videos/mockup.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
+https://github.com/user-attachments/assets/acc2c16c-dedf-4d57-be79-9c7354caee72
+
 
 ## 🔐 Demo Credentials
 - Email: jane@example.com
