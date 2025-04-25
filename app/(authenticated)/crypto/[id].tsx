@@ -135,9 +135,7 @@ const Page = () => {
                 style={[defaultStyles.pillButtonSmall, styles.buyButton]}
               >
                 <Ionicons name="arrow-back" size={24} color={"#fff"} />
-                <Text style={[defaultStyles.buttonText, { color: "#fff" }]}>
-                  Back
-                </Text>
+            
               </TouchableOpacity>
               <TouchableOpacity
                 style={[defaultStyles.pillButtonSmall, styles.buyButton]}
@@ -155,7 +153,7 @@ const Page = () => {
                 ]}
               >
                 <Ionicons
-                  name="arrow-back"
+                  name="arrow-down"
                   size={24}
                   color={Colors.primaryLight}
                 />
@@ -276,11 +274,11 @@ const styles = StyleSheet.create({
   buyButton: {
     backgroundColor: Colors.primaryLight,
     flexDirection: "row",
-    gap: 16,
+    gap: 10,
   },
   receiveButton: {
     flexDirection: "row",
-    gap: 16,
+    gap: 10,
   },
   categoryText: {
     fontSize: 14,

@@ -6,7 +6,7 @@ import { Text, View } from "../Themed";
 
 const styles = StyleSheet.create({
   container: {
-    width: "48%",
+    width: "45%",
     height: 150,
     borderRadius: 20,
     padding: 14,

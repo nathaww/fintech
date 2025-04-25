@@ -24,8 +24,8 @@ const WidgetList = () => {
         display: "flex",
         flexDirection: "row",
         flexWrap: "wrap",
-        justifyContent: "space-between",
-        gap: 15,
+        justifyContent: "center",
+        gap: 10,
         width: "100%",
       }}
     >
